@@ -1,5 +1,5 @@
 {
-  "name": "gelato-test",
+  "name": "gelato",
   "version": "1.0.0",
   "description": "gelato-test React component",
   "main": "lib/widget.js",
