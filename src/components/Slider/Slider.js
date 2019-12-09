@@ -63,7 +63,10 @@ const styles = createUseStyles({
     float: 'right'
   }
 })
-
+export const withClasses = Component => (props) => {
+  const classes = styles()
+  return <Component classes={classes} {...props} />
+}
 // eslint-disable-next-line react/no-redundant-should-component-update
 class Slider extends React.PureComponent {
   static propTypes = {
@@ -109,7 +112,8 @@ class Slider extends React.PureComponent {
       labelMin,
       labelMax,
       labelMaxPlus,
-      onChange
+      onChange,
+      classes
     } = this.props
     const { currentValue, currentValueActive } = this.state
     const defValue = unlimited && value === max ? 'Unlimited' : value
@@ -119,7 +123,6 @@ class Slider extends React.PureComponent {
         currentValueActive: false
       })
     }
-    const classes = styles()
     // eslint-disable-next-line radix
     const onFilterChange = e => this.setState({ currentValue: parseInt(e.target.value) })
     return (
@@ -154,4 +157,4 @@ Slider.defaultProps = {
   unlimited: false
 }
 
-export default Slider
+export default withClasses(Slider)

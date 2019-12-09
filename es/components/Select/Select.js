@@ -9,7 +9,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 import React from 'react';
-
 import { createUseStyles } from 'react-jss';
 import PropTypes from 'prop-types';
 import Fuse from 'fuse.js';
@@ -295,11 +294,11 @@ var Select = (_temp = _class = function (_React$Component) {
     var defValueIndex = options.map(function (e) {
       return e.value;
     }).indexOf(defValue);
-    var defValueLabel = options[defValueIndex].labelEmoji;
+    var defValueLabel = defValueIndex > -1 ? options[defValueIndex].labelEmoji : '';
     if (defValueActive) {
       this.setState({
         value: defValueLabel,
-        valueEmoji: options[defValueIndex].labelEmoji,
+        valueEmoji: defValueIndex > -1 ? options[defValueIndex].labelEmoji : '',
         defValueActive: false
       });
     }

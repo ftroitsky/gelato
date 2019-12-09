@@ -1,8 +1,7 @@
 import React from 'react'
 // eslint-disable-next-line no-unused-vars
-
 import PropTypes from 'prop-types'
-import countries from '../../../data/countries'
+import { countries } from '../../countries'
 import Filters from '../Filters'
 import List, { ListItem } from '../List'
 import Container from '../Container'
@@ -10,6 +9,8 @@ import Loader from '../Loader'
 import {
   filterPlans, findBestPlan, combineAppUrl
 } from '../../utils/utils'
+
+const initialPlans = plans => plans.map(plan => ({ ...plan, priceConverted: plan.priceConverted || plan.priceBase }))
 
 class Widget extends React.Component {
   static propTypes = {
@@ -34,7 +35,7 @@ class Widget extends React.Component {
 
   static defaultProps = {
     partnerId: '1024',
-    countryCode: 'DE',
+    countryCode: null,
     currency: 'EUR',
     mode: 'redirect',
     operator: '',
@@ -71,10 +72,17 @@ class Widget extends React.Component {
       itemsToShow = 10
     }
 
+    const initialInitialization = () => {
+      if (props.dev) {
+        return props.initialization
+      }
+      return !(props.plans && props.plans.length)
+    }
+
     this.state = {
-      initialization: props.dev ? props.initialization : true,
+      initialization: initialInitialization(),
       thinking: props.thinking || false,
-      plans: props.plans || [],
+      plans: initialPlans(props.plans || []),
       partnerId,
       itemsToShow,
       filters: {
@@ -90,9 +98,9 @@ class Widget extends React.Component {
   }
 
   async componentDidMount () {
-    await this.onUpdatePlans(true)
-
-    await this.onUpdatePlans()
+    if (!this.state.plans.length) {
+      await this.onUpdatePlans(true)
+    }
     const gaEvent = {
       eventCategory: 'widget',
       eventAction: 'load',
@@ -110,7 +118,7 @@ class Widget extends React.Component {
       const { plans, errorCode } = await this.props.onGetPlans(filters)
 
       if (!errorCode) {
-        this.setState({ plans })
+        this.setState({ plans: initialPlans(plans) })
       }
       this.setState({ thinking: false, initialization: false })
     }
@@ -207,7 +215,7 @@ class Widget extends React.Component {
     const plansFilteredTotal = plansToShow.length < plansFiltered.length ? plansFiltered.length : 0
 
     return (
-      <Container shadow>
+      <Container>
         <Loader thinking={initialization} />
         {
           showFilters && (
@@ -221,7 +229,7 @@ class Widget extends React.Component {
         {
           !showFilters && (
             <div>
-              { countries.filter(({ value }) => value === filters.countryCode)[0].label }
+              { filters.countryCode && countries.filter(({ value }) => value === filters.countryCode)[0].label }
             </div>
           )
         }
@@ -229,7 +237,7 @@ class Widget extends React.Component {
           thinking={thinking}
           total={plansFilteredTotal}
           partnerId={partnerId}
-          items={findBestPlan(plansToShow)}
+          items={findBestPlan(plansToShow, filters)}
           mode={mode}
           renderItem={item => <ListItem key={item.id} partnerId={partnerId} {...item} onDealClick={this.onDealClick} />}
           onShowAll={this.onShowAll}

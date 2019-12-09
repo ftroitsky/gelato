@@ -1,5 +1,4 @@
 import React from 'react'
-
 import { createUseStyles } from 'react-jss'
 import PropTypes from 'prop-types'
 import Fuse from 'fuse.js'
@@ -293,11 +292,11 @@ class Select extends React.Component {
       defValueActive
     } = this.state
     const defValueIndex = options.map(e => e.value).indexOf(defValue)
-    const defValueLabel = options[defValueIndex].labelEmoji
+    const defValueLabel = defValueIndex > -1 ? options[defValueIndex].labelEmoji : ''
     if (defValueActive) {
       this.setState({
         value: defValueLabel,
-        valueEmoji: options[defValueIndex].labelEmoji,
+        valueEmoji: defValueIndex > -1 ? options[defValueIndex].labelEmoji : '',
         defValueActive: false
       })
     }

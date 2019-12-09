@@ -1,5 +1,7 @@
 var _class, _temp2;
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -71,7 +73,12 @@ var styles = createUseStyles({
     float: 'right'
   }
 });
-
+export var withClasses = function withClasses(Component) {
+  return function (props) {
+    var classes = styles();
+    return React.createElement(Component, _extends({ classes: classes }, props));
+  };
+};
 // eslint-disable-next-line react/no-redundant-should-component-update
 var Slider = (_temp2 = _class = function (_React$PureComponent) {
   _inherits(Slider, _React$PureComponent);
@@ -109,7 +116,8 @@ var Slider = (_temp2 = _class = function (_React$PureComponent) {
         labelMin = _props.labelMin,
         labelMax = _props.labelMax,
         labelMaxPlus = _props.labelMaxPlus,
-        onChange = _props.onChange;
+        onChange = _props.onChange,
+        classes = _props.classes;
     var _state = this.state,
         currentValue = _state.currentValue,
         currentValueActive = _state.currentValueActive;
@@ -121,7 +129,6 @@ var Slider = (_temp2 = _class = function (_React$PureComponent) {
         currentValueActive: false
       });
     }
-    var classes = styles();
     // eslint-disable-next-line radix
     var onFilterChange = function onFilterChange(e) {
       return _this2.setState({ currentValue: parseInt(e.target.value) });
@@ -199,4 +206,4 @@ Slider.defaultProps = {
   unlimited: false
 };
 
-export default Slider;
+export default withClasses(Slider);

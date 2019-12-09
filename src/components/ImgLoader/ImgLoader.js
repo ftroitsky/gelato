@@ -35,6 +35,11 @@ const styles = createUseStyles({
   }
 })
 
+export const withClasses = Component => (props) => {
+  const classes = styles()
+  return <Component classes={classes} {...props} />
+}
+
 class ImgLoader extends React.PureComponent {
   static propTypes = {
     operatorId: PropTypes.string
@@ -58,9 +63,8 @@ class ImgLoader extends React.PureComponent {
   }
 
   render () {
-    const { operatorId } = this.props
+    const { operatorId, classes } = this.props
     const { imgLoaded, noImg } = this.state
-    const classes = styles()
     return (
       <div className={classes.root}>
         <img
@@ -85,4 +89,4 @@ class ImgLoader extends React.PureComponent {
   }
 }
 
-export default ImgLoader
+export default withClasses(ImgLoader)

@@ -1,8 +1,8 @@
 import _regeneratorRuntime from 'babel-runtime/regenerator';
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 var _class, _temp, _initialiseProps;
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
@@ -14,14 +14,19 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 import React from 'react';
 // eslint-disable-next-line no-unused-vars
-
 import PropTypes from 'prop-types';
-import countries from '../../../data/countries';
+import { countries } from '../../countries';
 import Filters from '../Filters';
 import List, { ListItem } from '../List';
 import Container from '../Container';
 import Loader from '../Loader';
 import { filterPlans, findBestPlan, combineAppUrl } from '../../utils/utils';
+
+var initialPlans = function initialPlans(plans) {
+  return plans.map(function (plan) {
+    return _extends({}, plan, { priceConverted: plan.priceConverted || plan.priceBase });
+  });
+};
 
 var Widget = (_temp = _class = function (_React$Component) {
   _inherits(Widget, _React$Component);
@@ -52,10 +57,17 @@ var Widget = (_temp = _class = function (_React$Component) {
       itemsToShow = 10;
     }
 
+    var initialInitialization = function initialInitialization() {
+      if (props.dev) {
+        return props.initialization;
+      }
+      return !(props.plans && props.plans.length);
+    };
+
     _this.state = {
-      initialization: props.dev ? props.initialization : true,
+      initialization: initialInitialization(),
       thinking: props.thinking || false,
-      plans: props.plans || [],
+      plans: initialPlans(props.plans || []),
       partnerId: partnerId,
       itemsToShow: itemsToShow,
       filters: {
@@ -78,14 +90,15 @@ var Widget = (_temp = _class = function (_React$Component) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              if (this.state.plans.length) {
+                _context.next = 3;
+                break;
+              }
+
+              _context.next = 3;
               return this.onUpdatePlans(true);
 
-            case 2:
-              _context.next = 4;
-              return this.onUpdatePlans();
-
-            case 4:
+            case 3:
               gaEvent = {
                 eventCategory: 'widget',
                 eventAction: 'load',
@@ -94,7 +107,7 @@ var Widget = (_temp = _class = function (_React$Component) {
 
               this.props.onSendEvent(gaEvent);
 
-            case 6:
+            case 5:
             case 'end':
               return _context.stop();
           }
@@ -128,7 +141,7 @@ var Widget = (_temp = _class = function (_React$Component) {
 
     return React.createElement(
       Container,
-      { shadow: true },
+      null,
       React.createElement(Loader, { thinking: initialization }),
       showFilters && React.createElement(Filters, {
         filters: filters,
@@ -138,7 +151,7 @@ var Widget = (_temp = _class = function (_React$Component) {
       !showFilters && React.createElement(
         'div',
         null,
-        countries.filter(function (_ref2) {
+        filters.countryCode && countries.filter(function (_ref2) {
           var value = _ref2.value;
           return value === filters.countryCode;
         })[0].label
@@ -147,7 +160,7 @@ var Widget = (_temp = _class = function (_React$Component) {
         thinking: thinking,
         total: plansFilteredTotal,
         partnerId: partnerId,
-        items: findBestPlan(plansToShow),
+        items: findBestPlan(plansToShow, filters),
         mode: mode,
         renderItem: function renderItem(item) {
           return React.createElement(ListItem, _extends({ key: item.id, partnerId: partnerId }, item, { onDealClick: _this2.onDealClick }));
@@ -161,7 +174,7 @@ var Widget = (_temp = _class = function (_React$Component) {
   return Widget;
 }(React.Component), _class.defaultProps = {
   partnerId: '1024',
-  countryCode: 'DE',
+  countryCode: null,
   currency: 'EUR',
   mode: 'redirect',
   operator: '',
@@ -205,7 +218,7 @@ var Widget = (_temp = _class = function (_React$Component) {
 
 
               if (!errorCode) {
-                _this3.setState({ plans: plans });
+                _this3.setState({ plans: initialPlans(plans) });
               }
               _this3.setState({ thinking: false, initialization: false });
 
